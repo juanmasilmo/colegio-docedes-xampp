@@ -1,2 +1,1 @@
-# prepCourse-Henry
-repo de prueba de mi prep course
+prueba de como crear un repo y clonarlo
