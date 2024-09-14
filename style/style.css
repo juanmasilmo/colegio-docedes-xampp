@@ -1,0 +1,29 @@
+.titulos{
+    color: rgb(255, 0, 0);
+    font-size: 1.5em;
+}
+#titulo{
+    font-size: 3em;
+}
+.imagenes {
+    display: flex;/*Activa el modelo de Flexbox*/
+    justify-content: center; /* Centra horizontalmente */
+    align-items: center; /* Centra verticalmente */ 
+    border: 2px solid black;
+    width: 50vw;
+    margin: auto;
+}
+.imagen2{
+    display: grid;
+    place-items: center;
+    border:1em solid rgb(179, 13, 13); 
+    width: 50vw;
+    margin: auto;
+}
+.imgs{
+    border-radius: 20px;
+    filter: brightness(120%) contrast(90%) sepia(50%);
+}
+.listas{
+    border-collapse: separate;
+}
