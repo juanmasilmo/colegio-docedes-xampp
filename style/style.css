@@ -15,21 +15,44 @@
     justify-content: center; /* Centra horizontalmente */
     align-items: center; /* Centra verticalmente */ 
     border: 2px solid black;
-    width: 50vw;
+    width: auto;
     margin: auto;
+    border-radius: 0.5em;
+    margin: 0.2em;
 }
 .imagen2{
     display: grid;
     place-items: center;
     border:1em solid rgb(179, 13, 13); 
-    width: 50vw;
+    width: auto;
     margin: auto;
+    border-radius: 0.5em;
+    margin: 0.2em;
 }
-.imgs{
-    border-radius: 20px;
-    filter: brightness(120%) contrast(90%) sepia(50%);
+
+.imagenes :hover{
+    filter: brightness(100%) contrast(100%) sepia(100%);
+}
+
+.imagen2 :hover{
+    filter: brightness(100%) contrast(100%) sepia(100%);
 }
 .listas{
     border-collapse: separate;
+<<<<<<< HEAD
 >>>>>>> 80d8463b1953b7da7c567d7390b866bf75ce6a79
+=======
+}
+#container {
+    background-color: tomato;
+    width: auto;
+    margin: 1em 0%;
+    border-radius: 1em;
+    display: flex;
+    justify-content: space-evenly;
+}
+#container2{
+    border: 0.2em solid black;
+    background-color: yellowgreen;
+>>>>>>> main
 }
