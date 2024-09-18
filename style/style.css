@@ -1,8 +1,9 @@
-<<<<<<< HEAD
+
 * {
     padding: 0%;
     margin: 0%;
-=======
+}
+
 .titulos{
     color: rgb(255, 0, 0);
     font-size: 1.5em;
@@ -39,9 +40,6 @@
 }
 .listas{
     border-collapse: separate;
-<<<<<<< HEAD
->>>>>>> 80d8463b1953b7da7c567d7390b866bf75ce6a79
-=======
 }
 #container {
     background-color: tomato;
@@ -51,8 +49,8 @@
     display: flex;
     justify-content: space-evenly;
 }
+
 #container2{
     border: 0.2em solid black;
     background-color: yellowgreen;
->>>>>>> main
 }
