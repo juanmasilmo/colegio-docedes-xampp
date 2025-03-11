@@ -1,6 +1,10 @@
 <?php
-function sanitizeInput($data) {
-    return htmlspecialchars(strip_tags(trim($data)), ENT_QUOTES, 'UTF-8');
+// Función para sanitizar inputs
+function sanitize_input($data) {
+    $data = trim($data);
+    $data = stripslashes($data);
+    $data = htmlspecialchars($data);
+    return $data;
 }
 
 function generateCSRFToken() {
@@ -17,5 +21,10 @@ function validateCSRFToken($token) {
 function redirect($url) {
     header("Location: $url");
     exit;
+}
+
+// Función para verificar si una sesión está activa
+function is_logged_in() {
+    return isset($_SESSION['user']) && !empty($_SESSION['user']);
 }
 ?>

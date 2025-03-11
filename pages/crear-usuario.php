@@ -1,17 +1,22 @@
 <?php
+require_once '../includes/session.php';
 require_once '../includes/database.php';
 
-session_start(); // Siempre al inicio del archivo
+// Obtener la conexión
+$conn = Database::getInstance();
 
-// Verificar si el usuario está logueado y es admin
-if (!isset($_SESSION['usuario_id']) || $_SESSION['rol'] !== 'admin') {
-    header("Location: ../login.php");
+// Verificar si ya existe algún usuario admin
+$checkAdmin = $conn->query("SELECT COUNT(*) as count FROM usuarios u JOIN roles r ON u.rol_id = r.id WHERE r.nombre_rol = 'admin'");
+$adminExists = $checkAdmin->fetch_assoc()['count'] > 0;
+
+// Solo verificar el rol si ya existe un admin
+if ($adminExists && isset($_SESSION['usuario_id']) && $_SESSION['rol'] !== 'admin') {
+    header("Location: login.php");
     exit();
 }
 
-// Ahora puedes usar los datos de la sesión
-$nombre_usuario = $_SESSION['nombre_usuario'];
-$rol = $_SESSION['rol'];
+// El resto del código de verificación de usuario logueado no es necesario
+// si quieres permitir que cualquier persona cree un usuario
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Recibir los datos del formulario
@@ -52,24 +57,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ";
         $stmtInsertPersona = $conn->prepare($sqlInsertPersona);
         $stmtInsertPersona->bind_param("sssssss", $nombre, $apellido, $dni, $telefono, $mail, $cuil, $domicilio);
-        $stmtInsertPersona->execute();
-        $persona_id = $stmtInsertPersona->insert_id;
 
-        // Hashear la contraseña
-        $passwordHash = password_hash($password, PASSWORD_DEFAULT);
+        if ($stmtInsertPersona->execute()) {
+            $persona_id = $stmtInsertPersona->insert_id;
 
-        // Insertar en la tabla usuarios
-        $sqlInsertUsuario = "
-            INSERT INTO usuarios (nombre_usuario, password, persona_id, rol_id)
-            VALUES (?, ?, ?, ?)
-        ";
-        $stmtInsertUsuario = $conn->prepare($sqlInsertUsuario);
-        $stmtInsertUsuario->bind_param("ssii", $nombre_usuario, $passwordHash, $persona_id, $rol_id);
-        $stmtInsertUsuario->execute();
+            // Hashear la contraseña
+            $passwordHash = password_hash($password, PASSWORD_DEFAULT);
 
-        // Redirigir al login con mensaje de éxito
-        header("Location: login.php?success=1");
-        exit();
+            // Insertar en la tabla usuarios
+            $sqlInsertUsuario = "
+                INSERT INTO usuarios (nombre_usuario, password, persona_id, rol_id)
+                VALUES (?, ?, ?, ?)
+            ";
+            $stmtInsertUsuario = $conn->prepare($sqlInsertUsuario);
+            $stmtInsertUsuario->bind_param("ssii", $nombre_usuario, $passwordHash, $persona_id, $rol_id);
+
+            if ($stmtInsertUsuario->execute()) {
+                header("Location: login.php?success=1");
+                exit();
+            } else {
+                $error = "Error al crear el usuario: " . $stmtInsertUsuario->error;
+            }
+        } else {
+            $error = "Error al crear la persona: " . $stmtInsertPersona->error;
+        }
     }
 
     // Cerrar conexiones
@@ -129,13 +140,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <select name="rol_id" required>
             <option value="">Seleccione un rol</option>
             <?php
-            // Listar roles disponibles
-            if ($_SESSION['rol'] <> 'admin') {
-                $sqlRoles = "SELECT id, nombre_rol FROM roles where nombre_rol <> 'admin'";
-                $resultRoles = $conn->query($sqlRoles);
-                while ($rowRole = $resultRoles->fetch_assoc()) {
-                    echo "<option value='" . $rowRole['id'] . "'>" . $rowRole['nombre_rol'] . "</option>";
-                }
+            // Listar TODOS los roles disponibles
+            $sqlRoles = "SELECT id, nombre_rol FROM roles";
+            $resultRoles = $conn->query($sqlRoles);
+            while ($rowRole = $resultRoles->fetch_assoc()) {
+                echo "<option value='" . $rowRole['id'] . "'>" . $rowRole['nombre_rol'] . "</option>";
             }
             ?>
         </select><br><br>

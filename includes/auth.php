@@ -8,7 +8,10 @@ class Auth
     {
         global $conn;
 
-        $stmt = $conn->prepare("SELECT * FROM usuarios WHERE username = ? AND activo = 1");
+        // Usar sanitize_input para limpiar el username
+        $username = sanitize_input($username);
+
+        $stmt = $conn->prepare("SELECT * FROM usuarios WHERE nombre_usuario = ?");
         $stmt->bind_param("s", $username);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -20,9 +23,9 @@ class Auth
 
             $_SESSION['user'] = [
                 'id' => $user['id'],
-                'username' => $user['username'],
+                'username' => $user['nombre_usuario'],
                 'rol_id' => $user['rol_id'],
-                'csrf_token' => bin2hex(random_bytes(32))
+                'csrf_token' => generateCSRFToken()
             ];
 
             return true;
@@ -30,10 +33,27 @@ class Auth
 
         return false;
     }
+    /*public static function checkRole($requiredRole, $redirect = true)
+    {
+        if (!isset($_SESSION['user']) || $_SESSION['user']['rol_id'] !== $requiredRole) {
+            if ($redirect) {
+                header("Location: ../login.php");
+                exit();
+            }
+            return false;
+        }
+        return true;
+    }*/
+
+    // Podemos añadir constantes para los roles para mejor legibilidad
+    const ROLE_ADMIN = 1;
+    const ROLE_AUDITOR = 2;
+    const ROLE_CONTADOR = 3;
 
     public static function checkRole($requiredRole)
     {
-        if (!isset($_SESSION['user']) || $_SESSION['user']['rol_id'] != $requiredRole) {
+        // Usar is_logged_in para verificar la sesión
+        if (!is_logged_in() || $_SESSION['user']['rol_id'] != $requiredRole) {
             return false;
         }
         return true;
